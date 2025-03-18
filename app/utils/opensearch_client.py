@@ -4,14 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Load OpenSearch credentials from Heroku Config Vars (or .env for local)
 OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
-OPENSEARCH_PORT = os.getenv("OPENSEARCH_PORT", 9200)
+OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT", "9200"))  # Convert to int
+OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
+OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Qweasd@502505")  # Default only for local
 
 client = OpenSearch(
     hosts=[{'host': OPENSEARCH_HOST, 'port': OPENSEARCH_PORT}],
-    http_auth=('admin', 'Qweasd@502505'),  # default credentials
-    use_ssl=False,                # since we're not using SSL locally
-    verify_certs=False
+    http_auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
+    use_ssl=OPENSEARCH_HOST != "localhost",  # Use SSL only if NOT localhost
+    verify_certs=OPENSEARCH_HOST != "localhost"
 )
 
 
