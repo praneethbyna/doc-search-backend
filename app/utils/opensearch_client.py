@@ -4,19 +4,39 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Load OpenSearch credentials from Heroku Config Vars (or .env for local)
-OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
-OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT", "9200"))  # Convert to int
-OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
-OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Qweasd@502505")  # Default only for local
+# # Load OpenSearch credentials from Heroku Config Vars (or .env for local)
+# OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
+# OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT", "9200"))  # Convert to int
+# OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
+# OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Qweasd@502505")  # Default only for local
 
+# client = OpenSearch(
+#     hosts=[{'host': OPENSEARCH_HOST, 'port': OPENSEARCH_PORT}],
+#     http_auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
+#     use_ssl=OPENSEARCH_HOST != "localhost",  # Use SSL only if NOT localhost
+#     verify_certs=OPENSEARCH_HOST != "localhost"
+# )
+
+# Retrieve environment variables
+OPENSEARCH_HOST = os.getenv('OPENSEARCH_HOST')
+OPENSEARCH_USER = os.getenv('OPENSEARCH_USER')
+OPENSEARCH_PASSWORD = os.getenv('OPENSEARCH_PASSWORD')
+
+# Initialize OpenSearch client
 client = OpenSearch(
-    hosts=[{'host': OPENSEARCH_HOST, 'port': OPENSEARCH_PORT}],
+    hosts=[{'host': OPENSEARCH_HOST, 'port': 443}],
     http_auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
-    use_ssl=OPENSEARCH_HOST != "localhost",  # Use SSL only if NOT localhost
-    verify_certs=OPENSEARCH_HOST != "localhost"
+    use_ssl=True,
+    verify_certs=True
 )
 
+
+# Example: Check if the cluster is reachable
+try:
+    info = client.info()
+    print("OpenSearch cluster info:", info)
+except Exception as e:
+    print("Failed to connect to OpenSearch:", e)
 
 def create_index(index_name):
     if not client.indices.exists(index=index_name):
