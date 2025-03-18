@@ -1,1 +1,1 @@
-web: gunicorn backend.app.__init__:app
+web: cd backend && gunicorn app:app
