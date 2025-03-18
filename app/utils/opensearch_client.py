@@ -1,6 +1,9 @@
 from opensearchpy import OpenSearch
 import os
+import logging
 from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
@@ -22,6 +25,8 @@ OPENSEARCH_HOST = os.getenv('OPENSEARCH_HOST')
 OPENSEARCH_USER = os.getenv('OPENSEARCH_USER')
 OPENSEARCH_PASSWORD = os.getenv('OPENSEARCH_PASSWORD')
 
+logging.debug(f"Connecting to OpenSearch at {OPENSEARCH_HOST} with user {OPENSEARCH_USER}")
+
 # Initialize OpenSearch client
 client = OpenSearch(
     hosts=[{'host': OPENSEARCH_HOST, 'port': 443}],
@@ -34,9 +39,9 @@ client = OpenSearch(
 # Example: Check if the cluster is reachable
 try:
     info = client.info()
-    print("OpenSearch cluster info:", info)
+    logging.debug("OpenSearch cluster info:", info)
 except Exception as e:
-    print("Failed to connect to OpenSearch:", e)
+    logging.error("Failed to connect to OpenSearch:", e)
 
 def create_index(index_name):
     if not client.indices.exists(index=index_name):
